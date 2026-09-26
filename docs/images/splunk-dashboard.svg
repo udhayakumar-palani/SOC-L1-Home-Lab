@@ -23,7 +23,7 @@
   <!-- flat line then spike -->
   <polyline points="70,315 700,315 730,200 755,300 785,145 810,315 940,315" fill="none" stroke="#a78bfa" stroke-width="2.4"/>
   <text x="890" y="200" font-size="10" fill="#a78bfa">SSH</text>
-  <text x="500" y="335" font-size="9" fill="#64748b" text-anchor="middle">10:00 PM Thu Sep 24 → 10:00 PM Fri Sep 25 2026</text>
+  <text x="500" y="335" font-size="9" fill="#64748b" text-anchor="middle">10:00 PM Thu Sep 24 -> 10:00 PM Fri Sep 25 2026</text>
 
   <!-- panel 2: top source IPs -->
   <rect x="30" y="358" width="460" height="180" rx="4" fill="#1e242c" stroke="#334155"/>
@@ -40,5 +40,5 @@
   <rect x="510" y="358" width="460" height="180" rx="4" fill="#1e242c" stroke="#334155"/>
   <text x="526" y="382" font-size="13" fill="#e2e8f0" font-weight="600">Suricata Alerts by Severity</text>
   <text x="740" y="450" font-size="12" fill="#64748b" text-anchor="middle">No results found</text>
-  <text x="740" y="470" font-size="10" fill="#475569" text-anchor="middle">(Suricata sensor not sending data yet — see README)</text>
+  <text x="740" y="470" font-size="10" fill="#475569" text-anchor="middle">(Suricata sensor not sending data yet - see README)</text>
 </svg>

@@ -23,7 +23,7 @@
     <text x="242" y="248" font-size="11" fill="#334155">- Hydra SSH brute force from Kali (10.60.56.67) against ubuntu-victim, user "ubuntu"</text>
     <text x="242" y="264" font-size="11" fill="#334155">- 15 failed password attempts in /var/log/auth.log across two bursts</text>
     <text x="242" y="280" font-size="11" fill="#334155">- Splunk fired: 7 attempts in one 5-minute window (threshold: 5)</text>
-    <text x="242" y="296" font-size="11" fill="#334155">- No successful authentication — attempted brute force, not a confirmed compromise</text>
+    <text x="242" y="296" font-size="11" fill="#334155">- No successful authentication - attempted brute force, not a confirmed compromise</text>
     <text x="242" y="318" font-size="11" fill="#334155" font-weight="600">MITRE ATT&amp;CK: T1110 - Brute Force</text>
     <text x="242" y="340" font-size="11" fill="#334155" font-weight="600">Recommended actions:</text>
     <text x="242" y="356" font-size="11" fill="#334155">- Block/rate-limit 10.60.56.67 at the security group level</text>

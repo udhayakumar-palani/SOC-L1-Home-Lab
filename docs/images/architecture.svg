@@ -6,7 +6,7 @@
   </defs>
 
   <rect x="0" y="0" width="980" height="560" fill="#ffffff"/>
-  <text x="30" y="34" font-size="18" font-weight="700" fill="#0f172a">SOC L1 Home Lab — network diagram</text>
+  <text x="30" y="34" font-size="18" font-weight="700" fill="#0f172a">SOC L1 Home Lab - network diagram</text>
   <text x="30" y="53" font-size="12" fill="#64748b">AWS · us-east-1 · one VPC, one flat subnet</text>
 
   <!-- VPC box -->
@@ -21,7 +21,7 @@
   <!-- kali -->
   <rect x="80" y="150" width="180" height="70" rx="6" fill="#ffffff" stroke="#334155" stroke-width="1.4"/>
   <text x="170" y="172" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">kali</text>
-  <text x="170" y="188" text-anchor="middle" font-size="10" fill="#475569">Kali Linux — attacker</text>
+  <text x="170" y="188" text-anchor="middle" font-size="10" fill="#475569">Kali Linux - attacker</text>
   <text x="170" y="202" text-anchor="middle" font-size="9" fill="#64748b">Hydra · Nmap · Atomic Red Team</text>
 
   <!-- windows victim -->
@@ -45,14 +45,14 @@
   <!-- splunk -->
   <rect x="290" y="378" width="180" height="76" rx="6" fill="#ffffff" stroke="#0f172a" stroke-width="2"/>
   <text x="380" y="401" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">splunk</text>
-  <text x="380" y="417" text-anchor="middle" font-size="10" fill="#475569">Splunk Enterprise — SIEM</text>
+  <text x="380" y="417" text-anchor="middle" font-size="10" fill="#475569">Splunk Enterprise - SIEM</text>
   <text x="380" y="431" text-anchor="middle" font-size="9" fill="#64748b">detections · dashboard · lookup</text>
   <text x="380" y="444" text-anchor="middle" font-size="9" fill="#64748b">receives on :9997</text>
 
   <!-- thehive -->
   <rect x="80" y="378" width="180" height="70" rx="6" fill="#ffffff" stroke="#334155" stroke-width="1.4" stroke-dasharray="4 3"/>
   <text x="170" y="400" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">thehive</text>
-  <text x="170" y="416" text-anchor="middle" font-size="10" fill="#475569">TheHive — case mgmt</text>
+  <text x="170" y="416" text-anchor="middle" font-size="10" fill="#475569">TheHive - case mgmt</text>
   <text x="170" y="430" text-anchor="middle" font-size="9" fill="#94a3b8">Cassandra + Elasticsearch</text>
 
   <!-- connecting lines: kali -> windows, kali -> ubuntu (attack) -->
