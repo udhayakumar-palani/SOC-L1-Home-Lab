@@ -10,6 +10,7 @@ dig into the logs a bit like an analyst would, and then open a real ticket
 for it. It's the same loop a Tier-1 SOC analyst runs every day, just small
 enough to fit on a laptop's budget.
 
+
 ## The picture
 
 ![Network diagram](docs/images/architecture.svg)
