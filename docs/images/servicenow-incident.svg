@@ -1,0 +1,38 @@
+<svg viewBox="0 0 1000 480" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="1000" height="480" fill="#f4f6f8"/>
+  <rect x="0" y="0" width="1000" height="44" fill="#123245"/>
+  <text x="20" y="28" font-size="15" fill="#ffffff" font-weight="700">servicenow</text>
+  <text x="900" y="28" font-size="12" fill="#cbd5e1">dev445382</text>
+
+  <text x="30" y="76" font-size="12" fill="#64748b">Incident</text>
+  <text x="30" y="98" font-size="20" font-weight="700" fill="#0f172a">INC0010001</text>
+
+  <rect x="30" y="116" width="940" height="330" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+
+  <g font-size="12" fill="#334155">
+    <text x="50" y="146" fill="#64748b">Caller</text>
+    <text x="230" y="146" font-weight="600">System Administrator</text>
+
+    <text x="50" y="176" fill="#64748b">Short description</text>
+    <text x="230" y="176" font-weight="600">T1110 - SSH Brute Force from 10.60.56.67 against ubuntu-victim</text>
+
+    <text x="50" y="206" fill="#64748b">Description</text>
+    <rect x="230" y="188" width="700" height="220" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="242" y="210" font-size="11" fill="#334155">Escalated from Splunk SOC Lab detection "T1110 - SSH Repeated Failed Logons (Ubuntu)".</text>
+    <text x="242" y="230" font-size="11" fill="#334155" font-weight="600">Timeline:</text>
+    <text x="242" y="248" font-size="11" fill="#334155">- Hydra SSH brute force from Kali (10.60.56.67) against ubuntu-victim, user "ubuntu"</text>
+    <text x="242" y="264" font-size="11" fill="#334155">- 15 failed password attempts in /var/log/auth.log across two bursts</text>
+    <text x="242" y="280" font-size="11" fill="#334155">- Splunk fired: 7 attempts in one 5-minute window (threshold: 5)</text>
+    <text x="242" y="296" font-size="11" fill="#334155">- No successful authentication — attempted brute force, not a confirmed compromise</text>
+    <text x="242" y="318" font-size="11" fill="#334155" font-weight="600">MITRE ATT&amp;CK: T1110 - Brute Force</text>
+    <text x="242" y="340" font-size="11" fill="#334155" font-weight="600">Recommended actions:</text>
+    <text x="242" y="356" font-size="11" fill="#334155">- Block/rate-limit 10.60.56.67 at the security group level</text>
+    <text x="242" y="372" font-size="11" fill="#334155">- Confirm no other weak-password accounts on ubuntu-victim</text>
+    <text x="242" y="388" font-size="11" fill="#334155">- Tune: threshold fired correctly, no change needed</text>
+  </g>
+
+  <rect x="770" y="140" width="180" height="26" rx="4" fill="#eef2ff" stroke="#6366f1"/>
+  <text x="860" y="158" font-size="11" fill="#4338ca" text-anchor="middle">State: New</text>
+
+  <text x="30" y="470" font-size="11" fill="#64748b">Created directly via ServiceNow's Table API-backed UI, from the confirmed Splunk alert above</text>
+</svg>

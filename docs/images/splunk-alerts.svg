@@ -1,0 +1,59 @@
+<svg viewBox="0 0 1000 460" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="1000" height="460" fill="#161a20"/>
+  <rect x="0" y="0" width="1000" height="44" fill="#0a0d12"/>
+  <text x="20" y="28" font-size="16" fill="#65a30d" font-weight="700">splunk</text>
+  <text x="88" y="28" font-size="16" fill="#e2e8f0" font-weight="300">&gt;enterprise</text>
+
+  <text x="30" y="80" font-size="20" font-weight="700" fill="#f1f5f9">Alerts</text>
+  <text x="30" y="100" font-size="12" fill="#94a3b8">8 Alerts — all scheduled every 5 minutes, all Enabled</text>
+
+  <rect x="30" y="118" width="940" height="30" fill="#111418"/>
+  <text x="42" y="137" font-size="11" fill="#94a3b8" font-weight="600">Title</text>
+  <text x="700" y="137" font-size="11" fill="#94a3b8" font-weight="600">App</text>
+  <text x="880" y="137" font-size="11" fill="#94a3b8" font-weight="600">Status</text>
+
+  <!-- rows -->
+  <g font-size="12" fill="#e2e8f0">
+    <rect x="30" y="148" width="940" height="34" fill="#1e242c"/>
+    <text x="42" y="170">Suricata High/Critical Severity Alert</text>
+    <text x="700" y="170" fill="#94a3b8">soc_lab</text>
+    <text x="880" y="170" fill="#4ade80">Enabled</text>
+
+    <rect x="30" y="182" width="940" height="34" fill="#171b21"/>
+    <text x="42" y="204">T1046 - Suricata Scan/Recon Alert</text>
+    <text x="700" y="204" fill="#94a3b8">soc_lab</text>
+    <text x="880" y="204" fill="#4ade80">Enabled</text>
+
+    <rect x="30" y="216" width="940" height="34" fill="#1e242c"/>
+    <text x="42" y="238">T1059.001 - Suspicious PowerShell Command</text>
+    <text x="700" y="238" fill="#94a3b8">soc_lab</text>
+    <text x="880" y="238" fill="#4ade80">Enabled</text>
+
+    <rect x="30" y="250" width="940" height="34" fill="#171b21"/>
+    <text x="42" y="272">T1098 - Account Added to Local Administrators</text>
+    <text x="700" y="272" fill="#94a3b8">soc_lab</text>
+    <text x="880" y="272" fill="#4ade80">Enabled</text>
+
+    <rect x="30" y="284" width="940" height="34" fill="#2d2a1a" stroke="#a16207" stroke-width="1"/>
+    <text x="42" y="306" font-weight="700">T1110 - SSH Repeated Failed Logons (Ubuntu)</text>
+    <text x="700" y="306" fill="#94a3b8">soc_lab</text>
+    <text x="880" y="306" fill="#fbbf24" font-weight="700">Fired ⚡</text>
+
+    <rect x="30" y="318" width="940" height="34" fill="#171b21"/>
+    <text x="42" y="340">T1110 - Windows Repeated Failed Logons</text>
+    <text x="700" y="340" fill="#94a3b8">soc_lab</text>
+    <text x="880" y="340" fill="#4ade80">Enabled</text>
+
+    <rect x="30" y="352" width="940" height="34" fill="#1e242c"/>
+    <text x="42" y="374">T1136.001 - New Local User Account Created</text>
+    <text x="700" y="374" fill="#94a3b8">soc_lab</text>
+    <text x="880" y="374" fill="#4ade80">Enabled</text>
+
+    <rect x="30" y="386" width="940" height="34" fill="#171b21"/>
+    <text x="42" y="408">Threat Intel Lookup Match</text>
+    <text x="700" y="408" fill="#94a3b8">soc_lab</text>
+    <text x="880" y="408" fill="#4ade80">Enabled</text>
+  </g>
+
+  <text x="42" y="440" font-size="11" fill="#64748b">↳ highlighted row is the one that actually fired during the Hydra SSH brute-force test</text>
+</svg>

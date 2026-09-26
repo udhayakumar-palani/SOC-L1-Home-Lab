@@ -1,0 +1,6 @@
+ip,category,confidence
+198.51.100.10,C2,high
+198.51.100.23,Scanner,medium
+203.0.113.55,TOR-exit,medium
+203.0.113.77,C2,high
+192.0.2.14,Scanner,low

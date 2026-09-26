@@ -1,0 +1,94 @@
+<powershell>
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$ErrorActionPreference = "Stop"
+
+# --- Audit policy: enable the event IDs the diagram/detections depend on ---
+# 4624/4625 (Logon), 4720 (user created), 4732 (added to local group)
+auditpol /set /subcategory:"Logon" /success:enable /failure:enable
+auditpol /set /subcategory:"User Account Management" /success:enable /failure:enable
+auditpol /set /subcategory:"Security Group Management" /success:enable /failure:enable
+auditpol /set /subcategory:"Process Creation" /success:enable /failure:enable
+
+# --- PowerShell Script Block Logging -> Event ID 4104 ---
+$sblPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging"
+New-Item -Path $sblPath -Force | Out-Null
+Set-ItemProperty -Path $sblPath -Name "EnableScriptBlockLogging" -Value 1 -Type DWord
+
+$modPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogging"
+New-Item -Path $modPath -Force | Out-Null
+Set-ItemProperty -Path $modPath -Name "EnableModuleLogging" -Value 1 -Type DWord
+
+# --- Sysmon ---
+New-Item -ItemType Directory -Path C:\SOCLab -Force | Out-Null
+Invoke-WebRequest -Uri "https://download.sysinternals.com/files/Sysmon.zip" -OutFile C:\SOCLab\Sysmon.zip -UseBasicParsing
+Expand-Archive -Path C:\SOCLab\Sysmon.zip -DestinationPath C:\SOCLab\Sysmon -Force
+
+@'
+${sysmon_config}
+'@ | Out-File -FilePath C:\SOCLab\sysmonconfig.xml -Encoding utf8
+
+C:\SOCLab\Sysmon\Sysmon64.exe -accepteula -i C:\SOCLab\sysmonconfig.xml
+
+# --- Splunk Universal Forwarder ---
+# Pin/verify this version+URL against https://www.splunk.com/en_us/download/universal-forwarder.html
+# if the download 404s (Splunk build hashes rotate with every release).
+$ufVersion = "9.2.1"
+$ufBuild = "78803f08aabb"
+$ufUrl = "https://download.splunk.com/products/universalforwarder/releases/$ufVersion/windows/splunkforwarder-$ufVersion-$ufBuild-x64-release.msi"
+$msiPath = "C:\SOCLab\splunkforwarder.msi"
+Invoke-WebRequest -Uri $ufUrl -OutFile $msiPath -UseBasicParsing
+
+Start-Process msiexec.exe -ArgumentList @(
+  "/i", $msiPath,
+  "AGREETOLICENSE=Yes",
+  "RECEIVING_INDEXER=${splunk_ip}:9997",
+  "WINEVENTLOG_SEC_ENABLE=1",
+  "WINEVENTLOG_SYS_ENABLE=1",
+  "WINEVENTLOG_APP_ENABLE=1",
+  "LAUNCHSPLUNK=1",
+  "/quiet"
+) -Wait
+
+$ufHome = "C:\Program Files\SplunkUniversalForwarder"
+
+@'
+[WinEventLog://Security]
+disabled = 0
+index = main
+
+[WinEventLog://Microsoft-Windows-Sysmon/Operational]
+disabled = 0
+index = main
+renderXml = 0
+
+[WinEventLog://Microsoft-Windows-PowerShell/Operational]
+disabled = 0
+index = main
+renderXml = 0
+'@ | Out-File -FilePath "$ufHome\etc\system\local\inputs.conf" -Encoding ascii
+
+@'
+[tcpout]
+defaultGroup = primary_indexers
+pass4SymmKey = ${pass4symmkey}
+
+[tcpout:primary_indexers]
+server = ${splunk_ip}:9997
+'@ | Out-File -FilePath "$ufHome\etc\system\local\outputs.conf" -Encoding ascii
+
+Restart-Service SplunkForwarder
+
+# --- Atomic Red Team: attack-simulation framework, run interactively by the
+# analyst later (see docs/06-attack-scenarios.md) to generate real telemetry
+# for the detections above. Installed here so it's ready to use; not auto-run.
+# Downloaded to disk and dot-sourced explicitly (no Invoke-Expression). ---
+try {
+  Set-ExecutionPolicy Bypass -Scope Process -Force
+  $artInstaller = "C:\SOCLab\install-atomicredteam.ps1"
+  Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/redcanaryco/invoke-atomicredteam/master/install-atomicredteam.ps1' -OutFile $artInstaller -UseBasicParsing
+  & $artInstaller
+  Install-AtomicRedTeam -getAtomics -Force
+} catch {
+  Write-Output "Atomic Red Team install failed (non-fatal): $_"
+}
+</powershell>

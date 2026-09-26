@@ -1,0 +1,23 @@
+#!/bin/bash
+set -eux
+
+apt-get update -y
+apt-get install -y docker.io docker-compose
+
+systemctl enable --now docker
+
+# Elasticsearch requirement
+sysctl -w vm.max_map_count=262144
+grep -q vm.max_map_count /etc/sysctl.conf || echo "vm.max_map_count=262144" >> /etc/sysctl.conf
+
+mkdir -p /opt/thehive
+cat >/opt/thehive/docker-compose.yml <<'EOF'
+${docker_compose}
+EOF
+
+cat >/opt/thehive/.env <<EOF
+THEHIVE_SECRET=${thehive_secret}
+EOF
+
+cd /opt/thehive
+docker-compose up -d

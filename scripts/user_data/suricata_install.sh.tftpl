@@ -1,0 +1,75 @@
+#!/bin/bash
+set -eux
+
+# Suricata IDS sensor. Replaces the inline pfSense+Suricata appliance from the
+# original diagram - in a VPC, AWS Security Groups/NACLs already do the stateful
+# firewalling pfSense provided, so this box focuses purely on the IDS role,
+# fed by AWS VPC Traffic Mirroring instead of sitting inline on a physical wire.
+
+add-apt-repository -y ppa:oisf/suricata-stable || true
+apt-get update -y
+apt-get install -y suricata jq
+
+PRIMARY_IFACE=$(ip -o -4 route show to default | awk '{print $5}')
+
+# AWS VPC Traffic Mirroring delivers packets to this ENI VXLAN-encapsulated on
+# UDP 4789. Terminate that tunnel locally so Suricata sees plain Ethernet frames.
+ip link add vxlan-mirror type vxlan id 0 dev "$PRIMARY_IFACE" dstport 4789
+ip link set vxlan-mirror mtu 9000
+ip link set vxlan-mirror up
+ip link set dev vxlan-mirror promisc on
+
+cat >/etc/systemd/system/vxlan-mirror.service <<UNIT
+[Unit]
+Description=Recreate VXLAN decap interface for AWS Traffic Mirroring
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/ip link add vxlan-mirror type vxlan id 0 dev $PRIMARY_IFACE dstport 4789
+ExecStartPost=/sbin/ip link set vxlan-mirror up
+ExecStartPost=/sbin/ip link set dev vxlan-mirror promisc on
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+UNIT
+systemctl enable vxlan-mirror.service
+
+sed -i "s|^HOME_NET:.*|HOME_NET: \"[${subnet_cidr}]\"|" /etc/suricata/suricata.yaml
+sed -i 's/^  - interface: .*/  - interface: vxlan-mirror/' /etc/suricata/suricata.yaml
+
+suricata-update || true
+systemctl enable suricata
+systemctl restart suricata
+
+# --- Ship eve.json to Splunk as JSON so alert.* fields extract cleanly ---
+UF_VERSION=9.2.1
+UF_BUILD=78803f08aabb
+UF_URL=https://download.splunk.com/products/universalforwarder/releases/$UF_VERSION/linux/splunkforwarder-$UF_VERSION-$UF_BUILD-linux-2.6-amd64.deb
+
+cd /tmp
+wget -q -O splunkforwarder.deb "$UF_URL"
+dpkg -i splunkforwarder.deb
+
+mkdir -p /opt/splunkforwarder/etc/system/local
+
+cat >/opt/splunkforwarder/etc/system/local/outputs.conf <<'EOF'
+[tcpout]
+defaultGroup = primary_indexers
+pass4SymmKey = ${pass4symmkey}
+
+[tcpout:primary_indexers]
+server = ${splunk_ip}:9997
+EOF
+
+cat >/opt/splunkforwarder/etc/system/local/inputs.conf <<'EOF'
+[monitor:///var/log/suricata/eve.json]
+disabled = 0
+index = main
+sourcetype = suricata
+EOF
+
+/opt/splunkforwarder/bin/splunk start --accept-license --no-prompt --answer-yes --seed-passwd 'ChangeMe_UF_123!'
+/opt/splunkforwarder/bin/splunk enable boot-start -user root --accept-license --answer-yes --no-prompt

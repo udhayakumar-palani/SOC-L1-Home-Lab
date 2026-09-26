@@ -1,0 +1,81 @@
+<Sysmon schemaversion="4.82">
+  <HashAlgorithms>SHA256</HashAlgorithms>
+  <CheckRevocation/>
+  <EventFiltering>
+
+    <!-- Event ID 1: Process Creation -->
+    <ProcessCreate onmatch="exclude">
+      <Image condition="end with">\svchost.exe</Image>
+      <Image condition="end with">\WmiPrvSE.exe</Image>
+      <ParentImage condition="end with">\explorer.exe</ParentImage>
+    </ProcessCreate>
+
+    <!-- Event ID 3: Network Connection -->
+    <NetworkConnect onmatch="include">
+      <Image condition="end with">powershell.exe</Image>
+      <Image condition="end with">cmd.exe</Image>
+      <Image condition="end with">rundll32.exe</Image>
+      <Image condition="end with">mshta.exe</Image>
+      <Image condition="end with">wscript.exe</Image>
+      <Image condition="end with">cscript.exe</Image>
+      <Image condition="end with">certutil.exe</Image>
+      <Image condition="end with">psexec.exe</Image>
+      <DestinationPort condition="is">4444</DestinationPort>
+      <DestinationPort condition="is">3389</DestinationPort>
+      <DestinationPort condition="is">22</DestinationPort>
+      <DestinationPort condition="is">445</DestinationPort>
+    </NetworkConnect>
+
+    <!-- Event ID 4: Sysmon service state change (always logged, no filter block needed) -->
+
+    <!-- Event ID 5: Process Terminate -->
+    <ProcessTerminate onmatch="exclude">
+      <Image condition="end with">\conhost.exe</Image>
+    </ProcessTerminate>
+
+    <!-- Event ID 7: Image/DLL load - noisy, keep narrow -->
+    <ImageLoad onmatch="include">
+      <ImageLoaded condition="contains">Temp</ImageLoaded>
+      <ImageLoaded condition="contains">AppData</ImageLoaded>
+    </ImageLoad>
+
+    <!-- Event ID 8: CreateRemoteThread - classic injection indicator -->
+    <CreateRemoteThread onmatch="exclude">
+      <SourceImage condition="end with">\VBoxService.exe</SourceImage>
+    </CreateRemoteThread>
+
+    <!-- Event ID 10: ProcessAccess - watch LSASS for credential dumping -->
+    <ProcessAccess onmatch="include">
+      <TargetImage condition="end with">\lsass.exe</TargetImage>
+    </ProcessAccess>
+
+    <!-- Event ID 11: FileCreate - startup/persistence-relevant paths only -->
+    <FileCreate onmatch="include">
+      <TargetFilename condition="contains">\Startup\</TargetFilename>
+      <TargetFilename condition="contains">\AppData\Roaming</TargetFilename>
+      <TargetFilename condition="end with">.ps1</TargetFilename>
+      <TargetFilename condition="end with">.hta</TargetFilename>
+      <TargetFilename condition="end with">.vbs</TargetFilename>
+    </FileCreate>
+
+    <!-- Event ID 12/13/14: Registry - persistence keys -->
+    <RegistryEvent onmatch="include">
+      <TargetObject condition="contains">\CurrentVersion\Run</TargetObject>
+      <TargetObject condition="contains">\CurrentVersion\RunOnce</TargetObject>
+      <TargetObject condition="contains">\Services\</TargetObject>
+      <TargetObject condition="contains">Winlogon\Shell</TargetObject>
+    </RegistryEvent>
+
+    <!-- Event ID 19/20/21: WMI persistence -->
+    <WmiEvent onmatch="exclude">
+      <Operation condition="is">n/a</Operation>
+    </WmiEvent>
+
+    <!-- Event ID 22: DNS Query -->
+    <DnsQuery onmatch="exclude">
+      <QueryName condition="end with">.microsoft.com</QueryName>
+      <QueryName condition="end with">.windowsupdate.com</QueryName>
+    </DnsQuery>
+
+  </EventFiltering>
+</Sysmon>

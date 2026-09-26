@@ -1,0 +1,52 @@
+services:
+  cassandra:
+    image: cassandra:4.1
+    restart: unless-stopped
+    environment:
+      - MAX_HEAP_SIZE=1G
+      - HEAP_NEWSIZE=200M
+      - CASSANDRA_CLUSTER_NAME=thehive
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+    networks: [thehive]
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.13
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - xpack.security.enabled=false
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    networks: [thehive]
+
+  thehive:
+    image: strangebee/thehive:5.2
+    restart: unless-stopped
+    depends_on: [cassandra, elasticsearch]
+    ports:
+      - "9000:9000"
+    environment:
+      - JVM_OPTS=-Xms1g -Xmx1g
+    volumes:
+      - thehive_data:/opt/thp/thehive/files
+    command:
+      - --cql-hostnames
+      - cassandra
+      - --index-backend
+      - elasticsearch
+      - --es-hostnames
+      - elasticsearch
+      - --no-config-cortex
+      - --secret
+      - ${THEHIVE_SECRET}
+    networks: [thehive]
+
+volumes:
+  cassandra_data:
+  es_data:
+  thehive_data:
+
+networks:
+  thehive:

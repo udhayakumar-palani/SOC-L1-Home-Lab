@@ -1,0 +1,69 @@
+#!/bin/bash
+set -eux
+
+# Splunk Enterprise (indexer + search head, single instance) - the "SIEM" box.
+# Pin/verify this version+URL against https://www.splunk.com/en_us/download/splunk-enterprise.html
+# if the download 404s (Splunk build hashes rotate with every release).
+SPLUNK_VERSION=9.2.1
+SPLUNK_BUILD=78803f08aabb
+SPLUNK_URL=https://download.splunk.com/products/splunk/releases/$SPLUNK_VERSION/linux/splunk-$SPLUNK_VERSION-$SPLUNK_BUILD-linux-2.6-amd64.deb
+
+cd /tmp
+wget -q -O splunk.deb "$SPLUNK_URL"
+dpkg -i splunk.deb
+
+# Run as root: this is a disposable lab box, not a hardened production install.
+/opt/splunk/bin/splunk start --accept-license --no-prompt --answer-yes --seed-passwd '${admin_password}'
+/opt/splunk/bin/splunk enable boot-start -user root --accept-license --answer-yes --no-prompt
+
+# Receive forwarded data on 9997, require pass4SymmKey from every UF.
+/opt/splunk/bin/splunk enable listen 9997 -auth "admin:${admin_password}"
+
+mkdir -p /opt/splunk/etc/system/local
+cat >>/opt/splunk/etc/system/local/inputs.conf <<'EOF'
+
+[splunktcp://9997]
+pass4SymmKey = ${pass4symmkey}
+disabled = 0
+
+[udp://514]
+sourcetype = suricata
+index = main
+disabled = 0
+EOF
+
+# Bind to the privileged syslog port (514) as root - matches the diagram's
+# "Receives on 9997 (forwarders) and 514 (syslog)" without needing setcap tricks
+# since Splunk itself is running as root here.
+
+# --- Deploy the soc_lab app: detections, dashboard, threat intel lookup ---
+APP=/opt/splunk/etc/apps/soc_lab
+mkdir -p "$APP/default/data/ui/views" "$APP/metadata" "$APP/lookups"
+
+cat >"$APP/default/app.conf" <<'EOF'
+${app_conf}
+EOF
+
+cat >"$APP/metadata/default.meta" <<'EOF'
+${default_meta}
+EOF
+
+cat >"$APP/default/savedsearches.conf" <<'EOF'
+${savedsearches_conf}
+EOF
+
+cat >"$APP/default/props.conf" <<'EOF'
+${props_conf}
+EOF
+
+cat >"$APP/default/data/ui/views/soc_overview.xml" <<'EOF'
+${dashboard_xml}
+EOF
+
+cat >"$APP/lookups/threat_intel.csv" <<'EOF'
+${lookup_csv}
+EOF
+
+chown -R root:root "$APP"
+
+/opt/splunk/bin/splunk restart

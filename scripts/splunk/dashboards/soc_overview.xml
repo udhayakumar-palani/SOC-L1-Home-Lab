@@ -1,0 +1,104 @@
+<form version="1.1" theme="dark">
+  <label>SOC Overview</label>
+  <description>Failed logins, top offending IPs, Suricata alerts, threat intel matches</description>
+  <fieldset submitButton="true" autoRun="true">
+    <input type="time" token="tr">
+      <label>Time Range</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Failed Logins Over Time (Windows + SSH)</title>
+      <chart>
+        <search>
+          <query>index=main (sourcetype="WinEventLog:Security" EventCode=4625) OR ((sourcetype="linux_secure" OR sourcetype="syslog") "Failed password")
+| eval source_type=if(sourcetype="WinEventLog:Security","Windows","SSH")
+| timechart span=15m count by source_type</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top Source IPs - Failed Logins</title>
+      <table>
+        <search>
+          <query>index=main (sourcetype="WinEventLog:Security" EventCode=4625) OR ((sourcetype="linux_secure" OR sourcetype="syslog") "Failed password")
+| rex field=_raw "Failed password for (invalid user )?(?&lt;ssh_user&gt;\S+) from (?&lt;ssh_ip&gt;\d+\.\d+\.\d+\.\d+)"
+| eval src_ip=coalesce(Source_Network_Address, ssh_ip)
+| stats count by src_ip
+| sort - count
+| head 15</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <title>Suricata Alerts by Severity</title>
+      <chart>
+        <search>
+          <query>index=main sourcetype="suricata" event_type=alert
+| stats count by alert.severity</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>New Admin Accounts (Created or Escalated)</title>
+      <table>
+        <search>
+          <query>index=main sourcetype="WinEventLog:Security" (EventCode=4720 OR (EventCode=4732 Group_Name="Administrators"))
+| eval account=coalesce(Account_Name, Member_Name), action=if(EventCode=4720,"Account Created","Added to Administrators")
+| table _time, account, action, Caller_User_Name, Computer
+| sort - _time</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Suspicious PowerShell Commands</title>
+      <table>
+        <search>
+          <query>index=main sourcetype="WinEventLog:Microsoft-Windows-PowerShell/Operational" EventCode=4104
+(Message="*-enc*" OR Message="*-EncodedCommand*" OR Message="*FromBase64String*" OR Message="*IEX*" OR Message="*DownloadString*")
+| table _time, Computer, User, Message
+| sort - _time</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Threat Intel Lookup Matches</title>
+      <table>
+        <search>
+          <query>index=main (sourcetype="WinEventLog:Security" EventCode=4625) OR (sourcetype="suricata" event_type=alert)
+| eval src_ip=coalesce(src_ip, Source_Network_Address)
+| lookup threat_intel.csv ip AS src_ip OUTPUT category, confidence
+| where isnotnull(category)
+| table _time, src_ip, category, confidence, sourcetype
+| sort - _time</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+</form>

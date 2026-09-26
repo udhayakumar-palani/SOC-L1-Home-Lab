@@ -1,0 +1,44 @@
+<svg viewBox="0 0 1000 560" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="1000" height="560" fill="#161a20"/>
+
+  <!-- top bar -->
+  <rect x="0" y="0" width="1000" height="44" fill="#0a0d12"/>
+  <text x="20" y="28" font-size="16" fill="#65a30d" font-weight="700">splunk</text>
+  <text x="88" y="28" font-size="16" fill="#e2e8f0" font-weight="300">&gt;enterprise</text>
+  <text x="900" y="28" font-size="12" fill="#94a3b8">SOC Lab</text>
+
+  <!-- title -->
+  <text x="30" y="82" font-size="22" font-weight="700" fill="#f1f5f9">SOC Overview</text>
+  <text x="30" y="104" font-size="12" fill="#94a3b8">Failed logins, top offending IPs, Suricata alerts, threat intel matches</text>
+
+  <!-- panel 1: failed logins over time -->
+  <rect x="30" y="126" width="940" height="220" rx="4" fill="#1e242c" stroke="#334155"/>
+  <text x="46" y="150" font-size="13" fill="#e2e8f0" font-weight="600">Failed Logins Over Time (Windows + SSH)</text>
+  <!-- axis -->
+  <line x1="70" y1="180" x2="70" y2="320" stroke="#475569"/>
+  <line x1="70" y1="320" x2="940" y2="320" stroke="#475569"/>
+  <text x="55" y="185" font-size="9" fill="#64748b" text-anchor="end">7.5</text>
+  <text x="55" y="250" font-size="9" fill="#64748b" text-anchor="end">5</text>
+  <text x="55" y="316" font-size="9" fill="#64748b" text-anchor="end">0</text>
+  <!-- flat line then spike -->
+  <polyline points="70,315 700,315 730,200 755,300 785,145 810,315 940,315" fill="none" stroke="#a78bfa" stroke-width="2.4"/>
+  <text x="890" y="200" font-size="10" fill="#a78bfa">SSH</text>
+  <text x="500" y="335" font-size="9" fill="#64748b" text-anchor="middle">10:00 PM Thu Sep 24 → 10:00 PM Fri Sep 25 2026</text>
+
+  <!-- panel 2: top source IPs -->
+  <rect x="30" y="358" width="460" height="180" rx="4" fill="#1e242c" stroke="#334155"/>
+  <text x="46" y="382" font-size="13" fill="#e2e8f0" font-weight="600">Top Source IPs - Failed Logins</text>
+  <rect x="46" y="396" width="428" height="26" fill="#111418"/>
+  <text x="56" y="414" font-size="11" fill="#94a3b8">src_ip</text>
+  <text x="440" y="414" font-size="11" fill="#94a3b8" text-anchor="end">count</text>
+  <rect x="46" y="422" width="428" height="30" fill="#252b33"/>
+  <text x="56" y="442" font-size="12" fill="#7dd3fc">10.60.56.67</text>
+  <text x="440" y="442" font-size="12" fill="#e2e8f0" text-anchor="end" font-weight="700">10</text>
+  <text x="46" y="500" font-size="10" fill="#64748b">↳ this is Kali, running Hydra against the Ubuntu victim</text>
+
+  <!-- panel 3: suricata by severity -->
+  <rect x="510" y="358" width="460" height="180" rx="4" fill="#1e242c" stroke="#334155"/>
+  <text x="526" y="382" font-size="13" fill="#e2e8f0" font-weight="600">Suricata Alerts by Severity</text>
+  <text x="740" y="450" font-size="12" fill="#64748b" text-anchor="middle">No results found</text>
+  <text x="740" y="470" font-size="10" fill="#475569" text-anchor="middle">(Suricata sensor not sending data yet — see README)</text>
+</svg>
